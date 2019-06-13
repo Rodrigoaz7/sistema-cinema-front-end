@@ -9,9 +9,12 @@ export default class TelaInicial extends Component {
             cidades: [],
             cinemas: [],
             sessoes: [],
+            sessao_atual: null,
             cidadeAtual: null,
             cinemaAtual: null,
-            loading: false
+            loading: false,
+            filtro_duracao: null,
+            filtro_classificacao_etaria: null
         }
     }
 
@@ -21,8 +24,8 @@ export default class TelaInicial extends Component {
     }
 
     escolherCinema = async (e) => {
-        let response = await provider.listarSessoes(e.target.value);
-        console.log(response)
+        this.setState({sessao_atual: e.target.value});
+        let response = await provider.listarSessoes(e.target.value, '', '');
         this.setState({ sessoes: response.data.sessoes })
     }
 
@@ -30,6 +33,21 @@ export default class TelaInicial extends Component {
         this.setState({ cidadeAtual: e.target.value })
         let response = await provider.listarCinemas(e.target.value);
         this.setState({ cinemas: response.data.cinemas })
+    }
+
+    handleTempo = async (input) => {
+        await this.setState({ filtro_duracao: input.target.value });   
+    }
+
+    handleClassificacao = async (input) => {
+        await this.setState({ filtro_classificacao_etaria: input.target.value });   
+    }
+
+    handleFiltrarClassificaoEtaria = async (e) => {
+        console.log("entrei")
+        await this.setState({filtro_classificacao_etaria: e.target.value})
+        let new_data = await provider.listarSessoes(this.state.sessao_atual, this.state.filtro_duracao, this.state.filtro_classificacao_etaria);
+        await this.setState({sessoes: new_data.data.sessoes})
     }
 
     render() {
@@ -185,12 +203,12 @@ export default class TelaInicial extends Component {
                 </section>
 
                 <section className="s-content">
-                    <div className="text-center">
+                    <div className="row masonry-wrap">
                         <h1>Procure pelo seu cinema</h1>
-
+                       
                         <div className="row">
                            
-                            <div className="col-lg-12">
+                            <div className="col-lg-3">
                                 Sua cidade
                                 <select name="cidades" className="form-control" value={this.state.cidadeAtual} 
                                     onChange={this.escolherCidade}>
@@ -200,28 +218,36 @@ export default class TelaInicial extends Component {
                                     )}
                                 </select>
                             </div>
-                            
-                            { this.state.cinemas && 
-                                <div className="col-lg-12">
-                                    Seu cinema
-                                    <select name="cinemas" className="form-control" 
-                                        onChange={this.escolherCinema}>
-                                        <option value={null} selected={true}>Escolha um cinema</option>
-                                        { this.state.cinemas.map((c, index) =>
-                                            <option value={c.id} key={index}>{c.nome}</option>
-                                        )}
-                                    </select>
-                                </div>
-                            }
+         
+                            <div className="col-lg-3">
+                                Seu cinema
+                                <select name="cinemas" className="form-control" 
+                                    onChange={this.escolherCinema}>
+                                    <option value={null} selected={true}>Escolha um cinema</option>
+                                    { this.state.cinemas.map((c, index) =>
+                                        <option value={c.id} key={index}>{c.nome}</option>
+                                    )}
+                                </select>
+                            </div>
+
+                                                    
+                            <label>Filtrar classificação etária</label>
+                            <select className="form-control" onChange={this.handleFiltrarClassificaoEtaria}>
+                                <option value={null}>Filtrar Classificação</option>
+                                <option value={0}>Livre</option>
+                                <option value={13}>13 anos</option>
+                                <option value={18}>18 anos</option>
+                            </select>
                         </div>
+
                     </div>
 
                 </section>
-                
+
                 { this.state.sessoes.length > 0 && 
+                <div>
+
                 <section className="s-content">
-                    
-                   
                     
                     <div className="row masonry-wrap">
                         <div className="masonry">
@@ -284,6 +310,7 @@ export default class TelaInicial extends Component {
                     </div>
 
                 </section>
+                </div>
                 }
                 <footer className="s-footer">
 

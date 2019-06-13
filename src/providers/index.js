@@ -1,35 +1,36 @@
 import axios from 'axios';
 
-const listarSessoes = async (idCinema) => {
+const listarSessoes = async (idCinema, duracao, classificacao_etaria) => {
     let dataResponse;
-    try{
-        dataResponse = await axios.get(`http://localhost:3000/sessoes/${idCinema}`);
-    }catch(error){
+    console.log(classificacao_etaria)
+    try {
+        dataResponse = await axios.get(`http://localhost:3000/sessoes/${idCinema}?classificacao_etaria=${classificacao_etaria}&duracao=${duracao}`);
+    } catch (error) {
         dataResponse = error;
     }
-    
+
     return dataResponse;
 }
 
 const listarCidades = async () => {
     let dataResponse;
-    try{
+    try {
         dataResponse = await axios.get(`http://localhost:3000/cidades`);
-    }catch(error){
+    } catch (error) {
         dataResponse = error;
     }
-    
+
     return dataResponse;
 }
 
 const listarCinemas = async (idCidade) => {
     let dataResponse;
-    try{
+    try {
         dataResponse = await axios.get(`http://localhost:3000/cinemas/${idCidade}`);
-    }catch(error){
+    } catch (error) {
         dataResponse = error;
     }
-    
+
     return dataResponse;
 }
 
